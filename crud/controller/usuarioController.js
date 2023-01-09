@@ -1,6 +1,9 @@
 import { json } from "express";
 import mongoose from "mongoose";
-import { emailRegistro } from "../helpers/emailRegistro.js";
+import {
+  emailForgetPassword,
+  emailRegistro,
+} from "../helpers/emailRegistro.js";
 import generarJWT from "../helpers/generarJWT.js";
 import generarToken from "../helpers/generarToken.js";
 import Usuario from "../models/Usuario.js";
@@ -79,9 +82,38 @@ const authenticate = async (req, res) => {
   }
 };
 
-const forgetPassword = async (req, res) => {};
+const forgetPassword = async (req, res) => {
+  //Find User
+  const user = await Usuario.findOne(req.body);
 
-const checkToken = async (req, res) => {
+  if (!user) {
+    const error = new Error("User doesn't exist");
+
+    return res.status(404).json({ msg: error.message });
+  }
+
+  try {
+    // Create Token
+    user.token = generarToken();
+    await user.save();
+
+    //Send email
+    const { email, token, name } = user;
+    emailForgetPassword({
+      email,
+      token,
+      name,
+    });
+
+    // Respond
+
+    return res.status(200).json({ msg: "Check your email to change password" });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const confirm = async (req, res) => {
   const token = req.params.token;
 
   const user = await Usuario.findOne({ token });
@@ -104,6 +136,52 @@ const checkToken = async (req, res) => {
     console.log(err);
   }
 };
-const newPassword = async (req, res) => {};
 
-export { register, authenticate, forgetPassword, checkToken, newPassword };
+const checkToken = async (req, res) => {
+  const token = req.params.token;
+
+  const user = await Usuario.findOne({ token });
+
+  if (!user) {
+    const error = new Error("You do not have permission to this page");
+
+    return res.status(403).json({ msg: error.message });
+  }
+
+  res.status(200).json({ msg: "Correct Token" });
+};
+const newPassword = async (req, res) => {
+  const { token } = req.params;
+
+  // Get user
+  const user = await Usuario.findOne({ token });
+
+  if (!user) {
+    const error = new Error("You do not have permission to this page");
+
+    return res.status(403).json({ msg: error.message });
+  }
+
+  // change password
+
+  try {
+    user.token = "";
+
+    user.password = req.body.password;
+
+    await user.save();
+
+    res.status(200).json({ msg: "Password has been changed" });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export {
+  register,
+  authenticate,
+  forgetPassword,
+  confirm,
+  checkToken,
+  newPassword,
+};

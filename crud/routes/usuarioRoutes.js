@@ -6,6 +6,7 @@ import {
   authenticate,
   forgetPassword,
   checkToken,
+  confirm,
   newPassword,
 } from "../controller/usuarioController.js";
 
@@ -17,7 +18,7 @@ router.post("/", authenticate);
 
 router.post("/register", register);
 
-router.get("/confirm/:token", checkToken);
+router.get("/confirm/:token", confirm);
 
 router.post("/forget-password", forgetPassword);
 

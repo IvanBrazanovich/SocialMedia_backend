@@ -1,4 +1,4 @@
-const generarToken = (id) => {
+const generarToken = () => {
   const number = Math.random().toString(32).slice(2);
   const fecha = Date.now().toString(32);
 
