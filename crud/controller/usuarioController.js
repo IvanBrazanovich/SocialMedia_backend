@@ -150,6 +150,7 @@ const checkToken = async (req, res) => {
 
   res.status(200).json({ msg: "Correct Token" });
 };
+
 const newPassword = async (req, res) => {
   const { token } = req.params;
 
@@ -177,6 +178,12 @@ const newPassword = async (req, res) => {
   }
 };
 
+const profile = (req, res) => {
+  const { usuario } = req;
+
+  res.json(usuario);
+};
+
 export {
   register,
   authenticate,
@@ -184,4 +191,5 @@ export {
   confirm,
   checkToken,
   newPassword,
+  profile,
 };
