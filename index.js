@@ -1,7 +1,9 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import usuarioRoutes from "./crud/routes/usuarioRoutes.js";
+import authRoutes from "./crud/routes/authRoutes.js";
+import postRoutes from "./crud/routes/postRoutes.js";
+import utilsRoutes from "./crud/routes/utilsRoutes.js";
 import conectarDB from "./crud/config/db.js";
 
 // Dotenv
@@ -11,7 +13,8 @@ dotenv.config();
 const app = express();
 
 // Be able to use json
-app.use(express.json());
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
 // Be able to change the port
 const PORT = process.env.PORT || 4000;
@@ -38,4 +41,8 @@ app.use(cors(corsOptions));
 app.listen(PORT, () => {});
 
 //Routes
-app.use("/api/usuarios", usuarioRoutes);
+app.use("/api/usuarios", authRoutes);
+
+app.use("/api/posts", postRoutes);
+
+app.use("/api/utils", utilsRoutes);
